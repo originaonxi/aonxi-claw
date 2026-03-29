@@ -1,0 +1,31 @@
+# Aonxi Claw — Agent Schedule
+# This supplements (does not replace) the existing crontab.
+# Claw uses this for dynamic scheduling overrides.
+
+agents:
+  PKM:
+    run_at: "06:00"         # 6am PST — first, so content is ready
+    command: "python3 ~/aonxi-pkm/pkm.py run"
+    timezone: "America/Los_Angeles"
+
+  AROS:
+    run_at: "08:00"         # 8am PST — after PKM warmup (Claw may delay further)
+    command: "python3 ~/aros-agent/aros.py --preview 10"
+    timezone: "America/Los_Angeles"
+    depends_on: PKM         # Won't run until PKM has completed
+
+  OUTREACH:
+    run_at: "07:00"         # 7am PST
+    command: "python3 ~/aonxi-outreach-agent/agent.py"
+    timezone: "America/Los_Angeles"
+
+  ARIA:
+    run_at: "09:00"         # 9am PST — after AROS (so pitch has latest ARR)
+    command: "python3 ~/aria/aria.py run --auto"
+    timezone: "America/Los_Angeles"
+    depends_on: AROS        # Won't run until AROS has completed
+
+  MEMCOLLAB:
+    run_at: "02:00"         # 2am PST — nightly reconciliation
+    command: "python3 ~/aonxi-memcollab/tools/distill_nightly.py"
+    timezone: "America/Los_Angeles"
